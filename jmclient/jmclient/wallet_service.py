@@ -745,6 +745,7 @@ class WalletService(Service):
                 for timenumber in range(FidelityBondMixin.TIMENUMBERS_PER_PUBKEY):
                     addresses.add(self.get_addr(md, address_type, index, timenumber))
             for index in range(self.gap_limit // FidelityBondMixin.TIMELOCK_GAP_LIMIT_REDUCTION_FACTOR):
+                index += next_unused
                 assert self.wallet.get_index_cache_and_increment(md, address_type) == index
                 for timenumber in range(FidelityBondMixin.TIMENUMBERS_PER_PUBKEY):
                     self.wallet.get_script_and_update_map(md, address_type, index, timenumber)
