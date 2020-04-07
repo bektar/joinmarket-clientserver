@@ -1656,19 +1656,18 @@ class FidelityBondMixin(object):
     @classmethod
     def _time_number_to_timestamp(cls, timenumber):
         """
-        converts a time number to a datetime object
+        converts a time number to a unix timestamp
         """
         year = cls.TIMELOCK_EPOCH_YEAR + (timenumber*cls.TIMENUMBER_UNIT) // cls.MONTHS_IN_YEAR
         month = cls.TIMELOCK_EPOCH_MONTH + (timenumber*cls.TIMENUMBER_UNIT) % cls.MONTHS_IN_YEAR
-        return datetime(year, month, *cls.TIMELOCK_DAY_AND_SHORTER)
+        return timegm(datetime(year, month, *cls.TIMELOCK_DAY_AND_SHORTER).timetuple())
 
     @classmethod
     def timestamp_to_time_number(cls, timestamp):
         """
         converts a datetime object to a time number
         """
-        #dt = datetime.utcfromtimestamp(unixtimestamp)
-        dt = timestamp
+        dt = datetime.utcfromtimestamp(timestamp)
         if (dt.month - cls.TIMELOCK_EPOCH_MONTH) % cls.TIMENUMBER_UNIT != 0:
             raise ValueError()
         day_and_shorter_tuple = (dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)
@@ -1682,8 +1681,7 @@ class FidelityBondMixin(object):
 
     @classmethod
     def _is_timelocked_path(cls, path):
-        #return path[2] == cls.BIP32_TIMELOCK_ID and isinstance(path[-1], datetime)
-        return isinstance(path[-1], datetime)
+        return len(path) > 4 and path[4] == cls.BIP32_TIMELOCK_ID
 
     @classmethod
     def _is_burn_path(cls, path):
@@ -1708,7 +1706,7 @@ class FidelityBondMixin(object):
     def _get_priv_from_path(self, path):
         if self._is_timelocked_path(path):
             key_path = path[:-1]
-            locktime = timegm(path[-1].timetuple())
+            locktime = path[-1]
             engine = ENGINES[TYPE_TIMELOCK_P2WSH]
             privkey = engine.derive_bip32_privkey(self._master_key, key_path)
             return (privkey, locktime), engine
@@ -1737,9 +1735,9 @@ class FidelityBondMixin(object):
     refering to the pubkey plus the timelock value which together are needed to create the address
     """
     def get_path_repr(self, path):
-        if self._is_timelocked_path(path):
+        if self._is_timelocked_path(path) and len(path) == 7:
             return super(FidelityBondMixin, self).get_path_repr(path[:-1]) +\
-                 ":" + str(timegm(path[-1].timetuple()))
+                 ":" + str(path[-1])
         else:
             return super(FidelityBondMixin, self).get_path_repr(path)
 
@@ -1752,7 +1750,7 @@ class FidelityBondMixin(object):
                 raise WalletError("Not a valid wallet timelock path: {}".format(pathstr))
             return tuple(chain(
                 super(FidelityBondMixin, self).path_repr_to_path(colon_chunks[0]),
-                (datetime.utcfromtimestamp(int(colon_chunks[1])),)
+                (int(colon_chunks[1]),)
             ))
 
     def get_details(self, path):

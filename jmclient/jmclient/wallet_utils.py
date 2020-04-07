@@ -463,7 +463,7 @@ def wallet_display(wallet_service, showprivkey, displayall=False,
                 for timenumber in range(FidelityBondMixin.TIMENUMBERS_PER_PUBKEY):
                     path = wallet_service.get_path(m, address_type, k, timenumber)
                     addr = wallet_service.get_address_from_path(path)
-                    timelock = path[-1]
+                    timelock = datetime.utcfromtimestamp(path[-1])
 
                     balance = sum([utxodata["value"] for utxo, utxodata in
                         iteritems(utxos[m]) if path == utxodata["path"]])
