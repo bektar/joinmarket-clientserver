@@ -1694,7 +1694,7 @@ class FidelityBondMixin(object):
             address_type = self.BIP32_TIMELOCK_ID
             ##BURN_ID not done yet
             for i in range(self._index_cache[md][address_type]):
-                for timenumber in range(TIMENUMBERS_PER_PUBKEY):
+                for timenumber in range(self.TIMENUMBERS_PER_PUBKEY):
                     path = self.get_path(md, address_type, i, timenumber)
                     script = self.get_script_from_path(path)
                     self._script_map[script] = path
