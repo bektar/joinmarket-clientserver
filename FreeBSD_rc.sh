@@ -17,7 +17,7 @@ rcvar="joinmarket_enable"
 
 command="$joinmarket_bin_dir/jmvenv/bin/python"
 
-procname=$command
+procname="$command"
 pidfile="/var/run/${name}.pid"
 
 required_files="$joinmarket_etc_dir/wallets/$joinmarket_wallet"
@@ -26,9 +26,9 @@ start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 
 extra_commands="history wallet generate"
-history_cmd="joinmarket_history"
-wallet_cmd="joinmarket_wallet"
-generate_cmd="joinmarket_generate"
+history_cmd="${name}_history"
+wallet_cmd="${name}_wallet"
+generate_cmd="${name}_generate"
 
 joinmarket_wallet()
 {
@@ -49,6 +49,7 @@ joinmarket_start()
 {
     echo -n $PASSWORD | /usr/sbin/daemon -o $joinmarket_etc_dir/daemon.log -p $pidfile $command $joinmarket_bin_dir/scripts/yg-privacyenhanced.py --wallet-password-stdin --datadir=$joinmarket_etc_dir wallet.jmdat
 }
+
 joinmarket_stop()
 {
     echo "Stopping joinmarket:"
