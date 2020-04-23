@@ -47,7 +47,7 @@ joinmarket_generate()
 
 joinmarket_start()
 {
-    echo -n $password | /usr/sbin/daemon -o $joinmarket_etc_dir/daemon.log -p $pidfile $command $joinmarket_bin_dir/scripts/yg-privacyenhanced.py --wallet-password-stdin --datadir=$joinmarket_etc_dir wallet.jmdat
+    echo -n $password | /usr/sbin/daemon -o /var/log/joinmarket -p $pidfile $command $joinmarket_bin_dir/scripts/yg-privacyenhanced.py --wallet-password-stdin --datadir=$joinmarket_etc_dir wallet.jmdat
 }
 
 joinmarket_stop()
