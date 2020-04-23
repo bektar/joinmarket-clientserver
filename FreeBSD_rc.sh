@@ -13,14 +13,14 @@ rcvar="joinmarket_enable"
 : ${joinmarket_wallet:="wallet.jmdat"}
 : ${joinmarket_bin_dir:="/usr/local/bin/${name}"}
 : ${joinmarket_etc_dir:="/usr/local/etc/${name}"}
-    PASSWORD="asdf"
 
 command="$joinmarket_bin_dir/jmvenv/bin/python"
 
 procname="$command"
 pidfile="/var/run/${name}.pid"
+password="$(cat $joinmarket_etc_dir/.secrets)"
 
-required_files="$joinmarket_etc_dir/wallets/$joinmarket_wallet"
+required_files="$joinmarket_etc_dir/wallets/$joinmarket_wallet $joinmarket_etc_dir/.secrets"
 
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
@@ -32,12 +32,12 @@ generate_cmd="${name}_generate"
 
 joinmarket_wallet()
 {
-    echo -n $PASSWORD | $command $joinmarket_bin_dir/scripts/wallet-tool.py --wallet-password-stdin --datadir=$joinmarket_etc_dir $joinmarket_wallet
+    echo -n $password | $command $joinmarket_bin_dir/scripts/wallet-tool.py --wallet-password-stdin --datadir=$joinmarket_etc_dir $joinmarket_wallet
 }
 
 joinmarket_history()
 {
-    echo -n $PASSWORD | $command $joinmarket_bin_dir/scripts/wallet-tool.py --wallet-password-stdin --datadir=$joinmarket_etc_dir $joinmarket_wallet history
+    echo -n $password | $command $joinmarket_bin_dir/scripts/wallet-tool.py --wallet-password-stdin --datadir=$joinmarket_etc_dir $joinmarket_wallet history
 }
 
 joinmarket_generate()
@@ -47,7 +47,7 @@ joinmarket_generate()
 
 joinmarket_start()
 {
-    echo -n $PASSWORD | /usr/sbin/daemon -o $joinmarket_etc_dir/daemon.log -p $pidfile $command $joinmarket_bin_dir/scripts/yg-privacyenhanced.py --wallet-password-stdin --datadir=$joinmarket_etc_dir wallet.jmdat
+    echo -n $password | /usr/sbin/daemon -o $joinmarket_etc_dir/daemon.log -p $pidfile $command $joinmarket_bin_dir/scripts/yg-privacyenhanced.py --wallet-password-stdin --datadir=$joinmarket_etc_dir wallet.jmdat
 }
 
 joinmarket_stop()
